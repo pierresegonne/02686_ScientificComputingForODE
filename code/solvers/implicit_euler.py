@@ -1,6 +1,7 @@
 import numpy as np
 
 from scipy.linalg import norm
+from utils import parse_adaptive_step_params, parse_newtons_params
 
 def newtons_method(f, J, t, x, dt, x_init, tol, max_iters, **kwargs):
     k = 0
@@ -29,9 +30,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     T = [t0]
     X = [x0]
 
-    # TODO parse kwargs
-    tol = 1e-8
-    max_iters = 100
+    kwargs, newtons_tol, newtons_max_iters = parse_newtons_params(kwargs)
 
     if not adaptive_step_size:
 
@@ -40,7 +39,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
             # Use explicit form to start off newton
             f_eval = f(T[-1], X[-1], **kwargs)
             x_init = X[-1] + dt*f_eval
-            X.append(newtons_method(f, J, T[-1], X[-1], dt, x_init, tol, max_iters, **kwargs))
+            X.append(newtons_method(f, J, T[-1], X[-1], dt, x_init, newtons_tol, newtons_max_iters, **kwargs))
             T.append(T[-1] + dt)
 
     if adaptive_step_size:

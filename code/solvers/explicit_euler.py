@@ -1,28 +1,6 @@
 import numpy as np
 
-DEFAULT_ABS_TOL = 1e-6
-DEFAULT_REL_TOL = 1e-6
-DEFAULT_EPS_TOL = 0.8
-DEFAULT_FACTOR_MAX = 5
-DEFAULT_FACTOR_MIN = 0.1
-
-def parse_one_adaptive_step_param(params, param_name, param_default_value):
-    if param_name in params.keys():
-        param = params[param_name]
-        del params[param_name]
-    else:
-        param = param_default_value
-    return params, param
-
-def parse_adaptive_step_params(params):
-
-    params, abstol = parse_one_adaptive_step_param(params, 'abstol', DEFAULT_ABS_TOL)
-    params, reltol = parse_one_adaptive_step_param(params, 'reltol', DEFAULT_REL_TOL)
-    params, epstol = parse_one_adaptive_step_param(params, 'epstol', DEFAULT_EPS_TOL)
-    params, facmax = parse_one_adaptive_step_param(params, 'facmax', DEFAULT_FACTOR_MAX)
-    params, facmin = parse_one_adaptive_step_param(params, 'facmin', DEFAULT_FACTOR_MIN)
-
-    return params, abstol, reltol, epstol, facmax, facmin
+from utils import parse_adaptive_step_params
 
 def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
