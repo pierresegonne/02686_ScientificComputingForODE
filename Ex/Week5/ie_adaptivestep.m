@@ -1,6 +1,6 @@
-mu = 1;
-x0 = [2.0; 0.0];
-tspan= [0; 5*mu];
+mu = 12;
+x0 = [0.5; 0.5];
+tspan= [0; 100];
 options = odeset('Jacobian',@JacVanDerPol,'RelTol',1.0e-6,'AbsTol',1.0e-6);
 [Tode,Xode]=ode15s(@VanDerPol, tspan, x0, options, mu);
 [X,T] = ImplicitEuleurAdaptiveStep(@VanderPolFunJac, tspan, x0, 1, 1.0e-6, 1.0e-6, [mu]);

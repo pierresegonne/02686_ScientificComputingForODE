@@ -1,3 +1,4 @@
+import numpy as np
 
 # Adaptive step size parameters
 DEFAULT_ABS_TOL = 1e-6
@@ -9,7 +10,6 @@ DEFAULT_FACTOR_MIN = 0.1
 # Newton's method parameters
 DEFAULT_NEWTONS_TOL = 1e-8
 DEFAULT_NEWTONS_MAX_ITERS = 100
-
 
 def parse_one_param(params, param_name, param_default_value):
     if param_name in params.keys():
@@ -37,3 +37,25 @@ def parse_adaptive_step_params(params):
     params, facmin = parse_one_param(params, 'facmin', DEFAULT_FACTOR_MIN)
 
     return params, abstol, reltol, epstol, facmax, facmin
+
+def rk_step(f, t, x, dt, butcher_tableau, **kwargs):
+    A = butcher_tableau['A']
+    B = butcher_tableau['B']
+    C = butcher_tableau['C']
+
+    if 'E' not in butcher_tableau.keys():
+        E = np.zeros(B.shape)
+    else:
+        E = butcher_tableau['E']
+
+    P = len(C)
+    K = np.zeros((P, x.shape[0]))
+
+    K[0,:] = f(t, x, **kwargs)
+
+    for p, (a, c) in enumerate(zip(A[1:],C[1:]), start=1):
+        t_p = t + dt*c
+        x_p = x + dt*(K.T@a)
+        K[p,:] = f(t_p, x_p, **kwargs)
+
+    return x + dt*(K.T@B), dt*(K.T@E)

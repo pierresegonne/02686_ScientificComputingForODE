@@ -1,7 +1,7 @@
 import numpy as np
 
 from scipy.linalg import norm
-from utils import parse_adaptive_step_params, parse_newtons_params
+from solvers.utils import parse_adaptive_step_params, parse_newtons_params
 
 def newtons_method(f, J, t, x, dt, x_init, tol, max_iters, **kwargs):
     k = 0
@@ -43,7 +43,45 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
             T.append(T[-1] + dt)
 
     if adaptive_step_size:
-        pass
+
+        kwargs, abstol, reltol, epstol, facmax, facmin = parse_adaptive_step_params(kwargs)
+
+        t = t0
+        x = x0
+
+        while t < tf:
+            if (t + dt > tf):
+                dt = tf - t
+
+            f_eval = f(t, x, **kwargs)
+            accept_step = False
+            while not accept_step:
+                # Take initial guess step of size dt
+                x_1_init = x + dt*f_eval
+                x_1 = newtons_method(f, J, t+dt, x, dt, x_1_init, newtons_tol, newtons_max_iters, **kwargs)
+
+                # Take two steps of size dt/2
+                x_hat_12_init = x + (dt/2)*f_eval
+                t_hat_12 = t + (dt/2)
+                x_hat_12 = newtons_method(f, J, t_hat_12, x, dt/2, x_hat_12_init, newtons_tol, newtons_max_iters, **kwargs)
+
+                f_eval_12 = f(t_hat_12, x_hat_12, **kwargs)
+                x_hat_init = x_hat_12 + (dt/2)*f_eval_12
+                x_hat = newtons_method(f, J, t+dt, x_hat_12, dt/2, x_hat_init, newtons_tol, newtons_max_iters, **kwargs)
+
+                # Error estimation
+                e = np.abs(x_1 - x_hat)
+                r = np.max(np.abs(e) / np.maximum(abstol, np.abs(x_hat)*reltol))
+
+                accept_step = (r <= 1)
+                if accept_step:
+                    t = t + dt
+                    x = x_hat
+
+                    T.append(t)
+                    X.append(x)
+
+                dt = np.maximum(facmin, np.minimum(np.sqrt(epstol/r), facmax)) * dt
 
     T = np.array(T)
     X = np.array(X)

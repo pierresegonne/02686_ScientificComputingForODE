@@ -2,3 +2,5 @@
 *.ps
 *.jpg
 *.png
+
+*.pyc

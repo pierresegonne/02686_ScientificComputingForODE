@@ -3,6 +3,9 @@ from scipy.integrate import ode
 
 def ode_solver(f, J, t0, tf, N, x0, **kwargs):
 
+    if 'adaptive_step_size' in kwargs.keys():
+        del kwargs['adaptive_step_size']
+
     r = ode(f, J).set_integrator('dopri5')
     r.set_initial_value(x0, t0).set_f_params(*kwargs.values()).set_jac_params(*kwargs.values())
 

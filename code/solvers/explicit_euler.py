@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import parse_adaptive_step_params
+from solvers.utils import parse_adaptive_step_params
 
 def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
@@ -19,8 +19,6 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     if adaptive_step_size:
 
         kwargs, abstol, reltol, epstol, facmax, facmin = parse_adaptive_step_params(kwargs)
-        print(kwargs, abstol, reltol, epstol, facmax, facmin)
-        exit()
 
         t = t0
         x = x0
@@ -44,7 +42,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
                 # Error estimation
                 e = np.abs(x_1 - x_hat)
-                r = np.max(e / np.maximum(abstol, np.abs(x_hat)*reltol))
+                r = np.max(np.abs(e) / np.maximum(abstol, np.abs(x_hat)*reltol))
 
                 accept_step = (r <= 1)
                 if accept_step:
