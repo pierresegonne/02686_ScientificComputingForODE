@@ -5,7 +5,7 @@ from problems.vanderpol import f, J
 
 from solvers.default import ode_solver as default_ode_solver
 from solvers.dopri54 import ode_solver as dopri54_ode_solver
-# from solvers.esdirk23 import ode_solver
+from solvers.esdirk23 import ode_solver as esdirk23_ode_solver
 from solvers.explicit_euler import ode_solver as explicit_euler_ode_solver
 from solvers.implicit_euler import ode_solver as implicit_euler_ode_solver
 # from solvers.own_rk import ode_solver
@@ -18,15 +18,15 @@ tf = 100;
 N = 5000;
 
 # Specific to problem
-mu = 12
+mu = 25
 x0 = np.array([0.5, 0.5])
 
 # Test eq
 lbd = -1
-#x0 = np.array([1])
+# x0 = np.array([1])
 
 # List of solvers.
-solvers = ['default', 'dopri54']
+solvers = ['default', 'esdirk23']
 
 plt.figure()
 for solver in solvers:
@@ -35,7 +35,7 @@ for solver in solvers:
     elif solver == 'dopri54':
         ode_solver = dopri54_ode_solver
     elif solver == 'esdirk23':
-        raise NotImplementedError
+        ode_solver = esdirk23_ode_solver
     elif solver == 'explicit_euler':
         ode_solver = explicit_euler_ode_solver
     elif solver == 'implicit_euler':
@@ -51,7 +51,10 @@ for solver in solvers:
 
     X, T = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=True, mu=mu)
 
-    plt.plot(X[:, 0], X[:, 1], label=f"{solver}")
+    if x0.shape[0] == 2:
+        plt.plot(X[:, 0], X[:, 1], label=f"{solver}")
+    else:
+        plt.plot(T, X, label=f"{solver}")
 
 plt.legend()
 plt.show()

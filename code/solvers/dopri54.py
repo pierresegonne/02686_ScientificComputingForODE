@@ -35,7 +35,7 @@ def dopri54_step(f, t, x, dt, **kwargs):
     return rk_step(f, t, x, dt, butcher_tableau, **kwargs)
 
 
-def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
+def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False, **kwargs):
 
     dt = (tf - t0)/N
 
@@ -84,5 +84,8 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
     T = np.array(T)
     X = np.array(X)
+    E = np.array(E)
 
+    if return_error:
+        return X, T, E
     return X, T
