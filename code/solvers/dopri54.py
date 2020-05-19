@@ -35,13 +35,17 @@ def dopri54_step(f, t, x, dt, **kwargs):
     return rk_step(f, t, x, dt, butcher_tableau, **kwargs)
 
 
-def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False, **kwargs):
+def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
     dt = (tf - t0)/N
 
     T = [t0]
     X = [x0]
     E = [0.01]
+    controllers = {
+        'E': [0.01],
+        'dt': [dt],
+    }
 
     if not adaptive_step_size:
 
@@ -73,19 +77,19 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
                 if accept_step:
                     t = t + dt
                     x = x_hat
-                    dt = dt * (epstol/r)**(k_i) * (E[-1]/r)**(k_p)
+                    dt = dt * (epstol/r)**(k_i) * (controllers['E'][-1]/r)**(k_p)
 
                     T.append(t)
                     X.append(x)
-                    E.append(r)
+                    controllers['dt'].append(dt)
+                    controllers['E'].append(r)
                 else:
                     dt = dt * (epstol / r)**(1/(p+1))
 
 
     T = np.array(T)
     X = np.array(X)
-    E = np.array(E)
+    controllers['dt'] = np.array(controllers['dt'])
+    controllers['E'] = np.array(controllers['E'])
 
-    if return_error:
-        return X, T, E
-    return X, T
+    return X, T, controllers

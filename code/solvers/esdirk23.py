@@ -20,7 +20,7 @@ E = B - B_hat
 P_ESDIRK23 = 3
 
 
-def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False, **kwargs):
+def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     global E
 
     dt = (tf - t0) / N
@@ -29,9 +29,10 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
 
     T = [t0]
     X = [x0]
-    E_ERROR = [0.01]
-    DT = [dt]
-    R_STEP_CONTROL = []
+    controllers = {
+        'dt': [dt],
+        'E': [0],
+    }
 
     # parameters needed,
     # tau: convergence newton
@@ -130,9 +131,9 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
                     if n_steps == 1:
                         dt_modified = (epsilon / r_step_control) ** (1 / p) * dt
                     else:
-                        dt_modified = (dt / DT[-1]) \
+                        dt_modified = (dt / controllers['dt'][-1]) \
                                       * ((epsilon / r_step_control) ** (1 / p)) \
-                                      * ((R_STEP_CONTROL[-1] / r_step_control) ** (1 / p)) \
+                                      * ((controllers['E'][-1] / r_step_control) ** (1 / p)) \
                                       * dt
 
                     dt = np.minimum(np.maximum(dt_modified, dt * hmin), dt * hmax)
@@ -148,8 +149,8 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
                 accept_step = True
                 dt = dt
 
-        DT.append(dt)
-        R_STEP_CONTROL.append(r_step_control)
+        controllers['dt'].append(dt)
+        controllers['E'].append(r_step_control)
 
         if accept_step:
 
@@ -158,7 +159,6 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
 
             T.append(t)
             X.append(x)
-            E_ERROR.append(e)
 
             n_steps += 1
             n_diverged_steps = 0
@@ -171,9 +171,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, return_error=False
 
     T = np.array(T)
     X = np.array(X).reshape((-1, x0.shape[0]))
-    E = np.array(E)
-    DT = np.array(DT)
+    controllers['dt'] = np.array(controllers['dt'])
+    controllers['E'] = np.array(controllers['E'])
 
-    if return_error:
-        return X, T, {'DT': DT, 'E': E_ERROR, 'R': R_STEP_CONTROL}
-    return X, T
+    return X, T, controllers

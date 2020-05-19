@@ -21,4 +21,4 @@ def ode_solver(f, J, t0, tf, N, x0, **kwargs):
     T = np.array(T)
     X = np.array(X)
 
-    return X, T
+    return X, T, {'dt': np.array([dt]), 'E': np.array([0])}

@@ -29,6 +29,10 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
     T = [t0]
     X = [x0]
+    controllers = {
+        'E': [0],
+        'dt': [dt]
+    }
 
     kwargs, newtons_tol, newtons_max_iters = parse_newtons_params(kwargs)
 
@@ -80,10 +84,14 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
                     T.append(t)
                     X.append(x)
+                    controllers['dt'].append(dt)
+                    controllers['E'].append(r)
 
                 dt = np.maximum(facmin, np.minimum(np.sqrt(epstol/r), facmax)) * dt
 
     T = np.array(T)
     X = np.array(X)
+    controllers['dt'] = np.array(controllers['dt'])
+    controllers['E'] = np.array(controllers['E'])
 
-    return X, T
+    return X, T, controllers
