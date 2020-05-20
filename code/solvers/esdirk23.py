@@ -31,7 +31,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     X = [x0]
     controllers = {
         'dt': [dt],
-        'E': [0],
+        'r': [0],
     }
 
     # parameters needed,
@@ -133,7 +133,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
                     else:
                         dt_modified = (dt / controllers['dt'][-1]) \
                                       * ((epsilon / r_step_control) ** (1 / p)) \
-                                      * ((controllers['E'][-1] / r_step_control) ** (1 / p)) \
+                                      * ((controllers['r'][-1] / r_step_control) ** (1 / p)) \
                                       * dt
 
                     dt = np.minimum(np.maximum(dt_modified, dt * hmin), dt * hmax)
@@ -150,7 +150,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
                 dt = dt
 
         controllers['dt'].append(dt)
-        controllers['E'].append(r_step_control)
+        controllers['r'].append(r_step_control)
 
         if accept_step:
 
@@ -172,6 +172,6 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     T = np.array(T)
     X = np.array(X).reshape((-1, x0.shape[0]))
     controllers['dt'] = np.array(controllers['dt'])
-    controllers['E'] = np.array(controllers['E'])
+    controllers['r'] = np.array(controllers['r'])
 
     return X, T, controllers

@@ -41,9 +41,8 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
     T = [t0]
     X = [x0]
-    E = [0.01]
     controllers = {
-        'E': [0.01],
+        'r': [0.01],
         'dt': [dt],
     }
 
@@ -77,19 +76,19 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
                 if accept_step:
                     t = t + dt
                     x = x_hat
-                    dt = dt * (epstol/r)**(k_i) * (controllers['E'][-1]/r)**(k_p)
+                    dt = dt * (epstol/r)**(k_i) * (controllers['r'][-1]/r)**(k_p)
 
                     T.append(t)
                     X.append(x)
-                    controllers['dt'].append(dt)
-                    controllers['E'].append(r)
                 else:
                     dt = dt * (epstol / r)**(1/(p+1))
+                controllers['dt'].append(dt)
+                controllers['r'].append(r)
 
 
     T = np.array(T)
     X = np.array(X)
     controllers['dt'] = np.array(controllers['dt'])
-    controllers['E'] = np.array(controllers['E'])
+    controllers['r'] = np.array(controllers['r'])
 
     return X, T, controllers

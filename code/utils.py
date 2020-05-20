@@ -55,6 +55,7 @@ def correct_controllers_shape(controllers, N):
     return controllers
 
 def controller_plot(T, all_controllers, solvers):
+    plt.rcParams.update({'axes.labelsize': 'x-large'})
     for i_c, controllers in enumerate(all_controllers):
         n = len(controllers.keys())
         fig, axs = plt.subplots(n)

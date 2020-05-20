@@ -22,7 +22,9 @@ def J(t, X, mu=1, **kwargs):
 
 
 def plot_states(T, X, solvers, solver_options):
-    fig, axs = plt.subplots(ncols=2, nrows=2)
+    plt.rcParams.update({'axes.labelsize': 'x-large'})
+
+    fig, axs = plt.subplots(ncols=2, nrows=2, figsize=(12,10))
     gs = axs[0, 0].get_gridspec()
     for ax in axs[0:, 0]:
         ax.remove()
@@ -42,5 +44,6 @@ def plot_states(T, X, solvers, solver_options):
         axs[1, 1].set_ylabel(r'$x_{2}$')
         axs[1, 1].set_xlabel('t')
 
-    fig.tight_layout()
+
+    plt.tight_layout()
     plt.legend()

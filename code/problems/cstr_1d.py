@@ -1,21 +1,12 @@
+import matplotlib.pyplot as plt
 import numpy as np
+
+from problems.cstr_shared import *
 
 x_dimension = 1
 
-'''--------------------- Constants ---------------------'''
-DeltaHr = -560  # Reaction Enthalpy
-rho = 1  # Density
-cp = 4.186  # Specific Heat Capacity
-Beta = DeltaHr / (rho * cp)
-Cain = 1.6 / 2  # Inlet Concentration A
-Cbin = 2.4 / 2  # Inlet Concentration B
-EaR = 8500  # Activation Energy
-Tin = 273.65  # Inlet Temperature Or 0.5 degree Celsius
-k0 = np.exp(24.6)  # Arrhenius Constant
-V = 0.105  # Volume of Reactor
 
-
-def f(t, X, F=0.1, **kwargs):
+def f(t, X, **kwargs):
     def Ca(T):
         return Cain + (1 / Beta) * (Tin - T)
 
@@ -29,14 +20,14 @@ def f(t, X, F=0.1, **kwargs):
         return Beta * r(Ca, Cb, T)
 
     T = X
-    return (F / V) * (Tin - T) + Rt(Ca(T), Cb(T), T)
+    return (F(t) / V) * (Tin - T) + Rt(Ca(T), Cb(T), T)
 
 
 def reaction_extent(T):
     return -2 / (Beta * Cbin) * (Tin - T)
 
 
-def J(t, X, F=0.1, **kwargs):
+def J(t, X, **kwargs):
     def Ca(T):
         return Cain + (1 / Beta) * (Tin - T)
 
@@ -57,11 +48,24 @@ def J(t, X, F=0.1, **kwargs):
 
     T = X
     return np.array([[
-        -(F / V) + Beta*(k_prime(T)*Ca(T)*Cb(T) + k(T)*Ca_prime(T)*Cb(T) + k(T)*Ca(T)*Cb_prime(T))
+        -(F(t) / V) + Beta * (k_prime(T) * Ca(T) * Cb(T) + k(T) * Ca_prime(T) * Cb(T) + k(T) * Ca(T) * Cb_prime(T))
     ]])
 
 
 '''--------------------- Plotting ---------------------'''
 
+
 def plot_states(T, X, solvers, solver_options):
-    pass
+    plt.rcParams.update({'axes.labelsize': 'x-large'})
+    plt.figure(figsize=(10, 3))
+
+    for i, solver in enumerate(solvers):
+        plt.plot(T[i], np.array(X[i]) - 273.15, label=f"{solver}", color=solver_options[solver]['color'])
+        plt.xlabel('t (min)')
+        plt.ylabel('T (°C)')
+        xticks = [5 * i for i in range(8)]
+        xlabels = [5 * i for i in range(8)]
+        plt.xticks(ticks=xticks, labels=xlabels)
+
+
+    plt.legend()
