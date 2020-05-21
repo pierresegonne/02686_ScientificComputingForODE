@@ -69,14 +69,14 @@ def get_ode_solver(solver):
 
 
 '''------------------ RUN ------------------'''
-solvers = ['default', 'explicit_euler', 'esdirk23']
-problem = 'cstr_3d'
+solvers = ['explicit_euler']
+problem = 'test_equation'
 
-adaptive_step_size = True
+adaptive_step_size = False
 
 t0 = 0
-tf = 35
-N = 10000
+tf = 1
+N = 2
 
 
 # Simple check for time scale of CSTR
@@ -94,6 +94,7 @@ for solver in solvers:
     print(f"Running solver {solver}")
 
     X, T, controllers = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=adaptive_step_size, **params)
+    print(X)
     all_X.append(X)
     all_T.append(T)
     all_controllers.append(controllers)

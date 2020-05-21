@@ -1,16 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
+from sys import path
+
+path.append(os.path.realpath('.'))
 
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
 
 from problems.test_equation import f, J
-from solvers.explicit_euler import ode_solver
+from solvers.implicit_euler import ode_solver
 
 # Parameters
 t0 = 0
-tf = 100
-Ns = np.linspace(tf*10, 100000, 100, dtype=int)
+tf = 10
+Ns = np.geomspace(100000, tf*5, 300, dtype=int)
 dts = np.array([(tf-t0)/N for N in Ns])
 
 # Test eq
@@ -18,10 +22,10 @@ lbd = -1
 x0 = np.array([1])
 
 l = []
-k = 1
+k = 10
 
 for i, N in enumerate(Ns):
-    X, T = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
+    X, T, _ = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
 
     x_local = X[k-1]*np.exp(lbd*dts[i])
     lk = np.abs(X[k] - x_local)
@@ -29,13 +33,21 @@ for i, N in enumerate(Ns):
 
 l = np.array(l)
 
-# dts_2 = PolynomialFeatures(2).fit_transform(dts[:, None])
-regressor = LinearRegression().fit(dts[:, None]**2, l)
-l_theoretical = regressor.predict(dts[:, None]**2)
+regressor = LinearRegression().fit(np.log(dts[:, None]**2), np.log(l))
+l_theoretical = regressor.predict(np.log(dts[:, None]**2))
 
-plt.plot(dts, l)
-plt.plot(dts, l_theoretical)
-plt.legend(['l', r'$O(dt^{2})$'])
-# plt.yscale('log')
-# plt.xscale('log')
+plt.rcParams.update({
+    'axes.labelsize': 'x-large',
+    'font.size': 20,
+})
+
+plt.figure()
+plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color='brown')
+plt.plot(dts, np.exp(l_theoretical), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{2})$', linewidth=2, color='grey')
+plt.legend()
+plt.xlabel('h')
+plt.ylabel(r'$l_{k}$')
+plt.yscale('log')
+plt.xscale('log')
+
 plt.show()
