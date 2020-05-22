@@ -10,7 +10,7 @@ def sde_solver(f, J, g, dW, t0, tf, N, x0, **kwargs):
     for k in range(N):
         f_eval = f(T[-1], X[-1], **kwargs)
         g_eval = g(T[-1], X[-1], **kwargs)
-        X.append(X[-1] + dt * f_eval + dW[k-1] * g_eval) # k - 1 for dW as it starts at index 1
+        X.append(X[-1] + dt * f_eval + dW[k] * g_eval)
         T.append(T[-1] + dt)
 
     T = np.array(T)

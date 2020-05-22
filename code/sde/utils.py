@@ -32,7 +32,7 @@ def parse_newtons_params(params):
 
 
 colors = [
-    'black',
+    # 'black',
     'grey',
     'brown',
     'peru',
@@ -49,3 +49,15 @@ def get_rcolor(seed=None):
     if seed:
         np.random.seed(seed)
     return colors[np.random.randint(0, len(colors))]
+
+
+def wiener_process(T, N, dims=2):
+    W = np.zeros((N, dims))
+    dt = T / N
+    dW = np.random.normal(loc=0, scale=np.sqrt(dt), size=(N - 1, dims))
+    W[1:, :] = np.cumsum(dW, axis=0)
+
+    # adapt size of dW array
+    dW = np.vstack((np.zeros((1, dims)), dW))
+
+    return dW, W

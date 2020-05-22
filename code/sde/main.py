@@ -10,13 +10,14 @@ from vanderpol import x_dimension as vanderpol_x_dimension, f as vanderpol_f, J 
     diffusion_1 as vanderpol_g_1, diffusion_2 as vanderpol_g_2, plot_states as vanderpol_plot_states
 
 from utils import DEFAULT_ABS_TOL, DEFAULT_REL_TOL, DEFAULT_NEWTONS_TOL, DEFAULT_NEWTONS_MAX_ITERS
+from utils import wiener_process
 
 
 def get_problem(problem):
     if problem == 'vanderpol_1':
         x_dimension, f, J, g, plotter = vanderpol_x_dimension, vanderpol_f, vanderpol_J, vanderpol_g_1, vanderpol_plot_states
         x0 = np.array([0.5, 0.5])
-        params = {'mu': 2, 'sigma': 0.5}
+        params = {'mu': 12, 'sigma': 0.5}
     elif problem == 'vanderpol_2':
         x_dimension, f, J, g, plotter = vanderpol_x_dimension, vanderpol_f, vanderpol_J, vanderpol_g_2, vanderpol_plot_states
         x0 = np.array([0.5, 0.5])
@@ -36,15 +37,6 @@ def get_sde_solver(solver):
     else:
         print(f'Wrong solver name {solver}')
         exit()
-
-
-def wiener_process(T, N, dims=2):
-    W = np.zeros((N, dims))
-    dt = T / N
-    dW = np.random.normal(loc=0, scale=np.sqrt(dt), size=(N - 1, dims))
-    W[1:, :] = np.cumsum(dW, axis=0)
-
-    return dW, W
 
 
 def ode_solver(f, J, t0, tf, N, x0, **kwargs):

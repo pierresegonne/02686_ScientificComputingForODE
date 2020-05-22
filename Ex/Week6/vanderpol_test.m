@@ -9,10 +9,10 @@ N = 1000;
 Ns = 5;
 seed = 100;
 
-[W,T,~]=StdWienerProcess(tf,N,nw,Ns,seed);
+[W,Tw,~]=StdWienerProcess(tf,N,nw,Ns,seed);
 X = zeros(Ns,N+1,length(x0));
 for s=1:Ns
-    X(s,:,:) = SDEEulerExplicitExplicit(@VanderpolDrift, @VanderPolDiffusion1, Tw, x0, W(:,:,s), p);
+    X(s,:,:) = SDEEulerImplicitExplicit(@VanderpolDrift, @VanderPolDiffusion1, Tw, x0, W(:,:,s), p);
 end
 
 Xd = SDEEulerExplicitExplicit(@VanderpolDrift, @VanderPolDiffusion1, Tw, x0, W(:,:,s), [mu; 0]);

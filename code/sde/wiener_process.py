@@ -17,6 +17,9 @@ def wiener_process(T, N, dims=2):
     dW = np.random.normal(loc=0, scale=dt, size=(N - 1, dims))
     W[1:, :] = np.cumsum(dW, axis=0)
 
+    # adapt size of dW array
+    dW = np.vstack((np.zeros((1, dims)), dW))
+
     return dW, W
 
 
