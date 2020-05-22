@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+"""
+This is a simple demonstrator for definitions of truncation errors.
+"""
+
 x = np.linspace(0,1,1000)
 approx = np.array([20, 10, 5])
 

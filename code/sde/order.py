@@ -13,7 +13,7 @@ from test_equation import f, J, g, t0, tf, params, x_dimension
 N_REALISATIONS = 1000
 
 n_step_trials = 25
-Ns = np.geomspace(5000, 10, n_step_trials, dtype=int)
+Ns = np.geomspace(10000, 10, n_step_trials, dtype=int)
 dts = T / Ns
 
 ee_E = np.zeros((n_step_trials,))
@@ -62,10 +62,10 @@ for i, N in enumerate(Ns):
     ee_E[i] = np.mean(np.abs(all_xT - all_xT_ee))
     ie_E[i] = np.mean(np.abs(all_xT - all_xT_ie))
 
-regressor = LinearRegression().fit(dts[:, None], ee_E)
-e_theoretical_ee = regressor.predict(dts[:, None])
-regressor = LinearRegression().fit(dts[:, None], ie_E)
-e_theoretical_ie = regressor.predict(dts[:, None])
+regressor = LinearRegression().fit(np.log(dts[:, None]), np.log(ee_E))
+e_theoretical_ee = regressor.predict(np.log(dts[:, None]))
+regressor = LinearRegression().fit(np.log(dts[:, None]), np.log(ie_E))
+e_theoretical_ie = regressor.predict(np.log(dts[:, None]))
 
 plt.rcParams.update({
     'axes.labelsize': 'x-large',
@@ -74,14 +74,14 @@ plt.rcParams.update({
 
 plt.figure()
 plt.plot(dts, ee_E, label=r'True $e_{k}$', linewidth=2, color='olivedrab')
-plt.plot(dts, e_theoretical_ee, label=r'Theoretical $e_{k}$, $\mathcal{O}(h)$', linewidth=2, color='grey')
+plt.plot(dts, np.exp(e_theoretical_ee), label=r'Theoretical $e_{k}$, $\mathcal{O}(h)$', linewidth=2, color='grey')
 plt.xlabel('h')
 plt.ylabel(r'$l_{k}$')
 plt.legend()
 
 plt.figure()
 plt.plot(dts, ie_E, label=r'True $e_{k}$', linewidth=2, color='brown')
-plt.plot(dts, e_theoretical_ie, label=r'Theoretical $e_{k}$, $\mathcal{O}(h)$', linewidth=2, color='grey')
+plt.plot(dts, np.exp(e_theoretical_ie), label=r'Theoretical $e_{k}$, $\mathcal{O}(h)$', linewidth=2, color='grey')
 plt.xlabel('h')
 plt.ylabel(r'$l_{k}$')
 plt.legend()

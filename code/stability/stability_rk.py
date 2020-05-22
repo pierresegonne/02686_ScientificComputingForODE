@@ -45,7 +45,7 @@ B_hat = np.array(
 E = B - B_hat
 
 # Meshgrid
-n = 500
+n = 1000
 plot_span = 20
 real = np.linspace(-plot_span, plot_span, n)
 imag = np.linspace(-plot_span, plot_span, n)
@@ -62,6 +62,11 @@ for i_r, r in enumerate(real):
 
 absR = np.clip(absR, 0, 1).T
 
+plt.rcParams.update({
+    'axes.labelsize': 'x-large',
+    'font.size': 20,
+})
+
 fig, ax = plt.subplots(nrows=1, ncols=1)
 im = ax.imshow(absR, extent=[-plot_span, plot_span, -plot_span, plot_span], aspect='auto', cmap='RdYlGn_r')
 ax.axhline(y=0, color='k')
@@ -69,6 +74,6 @@ ax.axvline(x=0, color='k')
 fig.colorbar(im, ax=ax)
 ax.set_ylabel(r'Im(h$\lambda$)')
 ax.set_xlabel(r'Re(h$\lambda$)')
-ax.set_title('TODO')
+#ax.set_title('TODO')
 
 plt.show()
