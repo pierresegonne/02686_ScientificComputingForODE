@@ -15,7 +15,7 @@ from solvers.dopri54 import ode_solver as dopri54_ode_solver
 from solvers.esdirk23 import ode_solver as esdirk23_ode_solver
 from solvers.explicit_euler import ode_solver as explicit_euler_ode_solver
 from solvers.implicit_euler import ode_solver as implicit_euler_ode_solver
-# from solvers.own_rk import ode_solver
+from solvers.own_rk import ode_solver as own_rk_ode_solver
 from solvers.rk4 import ode_solver as rk4_ode_solver
 
 from utils import *
@@ -60,7 +60,7 @@ def get_ode_solver(solver):
     elif solver == 'implicit_euler':
         ode_solver = implicit_euler_ode_solver
     elif solver == 'own_rk':
-        raise NotImplementedError
+        ode_solver = own_rk_ode_solver
     elif solver == 'rk4':
         ode_solver = rk4_ode_solver
     else:
@@ -69,14 +69,14 @@ def get_ode_solver(solver):
 
 
 '''------------------ RUN ------------------'''
-solvers = ['explicit_euler']
+solvers = ['own_rk', 'default']
 problem = 'test_equation'
 
 adaptive_step_size = False
 
 t0 = 0
-tf = 1
-N = 2
+tf = 3
+N = 6
 
 
 # Simple check for time scale of CSTR
@@ -94,7 +94,6 @@ for solver in solvers:
     print(f"Running solver {solver}")
 
     X, T, controllers = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=adaptive_step_size, **params)
-    print(X)
     all_X.append(X)
     all_T.append(T)
     all_controllers.append(controllers)

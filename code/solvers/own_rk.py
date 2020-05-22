@@ -1,0 +1,46 @@
+import numpy as np
+
+from solvers.utils import parse_adaptive_step_params, rk_step
+
+# Butcher Tableau
+C = np.array([0, 1 / 3, 2 / 3])
+A = np.array([
+    [0, 0, 0],
+    [1 / 3, 0, 0],
+    [0, 2 / 3, 0],
+])
+B = np.array([1 / 4, 0, 3 / 4])
+
+
+def own_rk_step(f, t, x, dt, **kwargs):
+    butcher_tableau = {
+        'A': A,
+        'B': B,
+        'C': C,
+    }
+
+    return rk_step(f, t, x, dt, butcher_tableau, **kwargs)[0]  # no error estimation.
+
+
+def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
+    dt = (tf - t0) / N
+
+    T = [t0]
+    X = [x0]
+    controllers = {
+        'r': [0],
+        'dt': [dt]
+    }
+
+    if not adaptive_step_size:
+
+        for k in range(N):
+            X.append(own_rk_step(f, T[-1], X[-1], dt, **kwargs))
+            T.append(T[-1] + dt)
+
+    T = np.array(T)
+    X = np.array(X)
+    controllers['dt'] = np.array(controllers['dt'])
+    controllers['r'] = np.array(controllers['r'])
+
+    return X, T, controllers

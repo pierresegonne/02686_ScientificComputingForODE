@@ -4,17 +4,21 @@ import os
 
 from sys import path
 
-path.append(os.path.realpath('.'))
+path.append(os.path.realpath('..'))
 
 from sklearn.linear_model import LinearRegression
 
 from problems.test_equation import f, J
-from solvers.implicit_euler import ode_solver
+from solvers.own_rk import ode_solver
+
+'''------------- Expected order -------------'''
+p = 3
+'''------------------------------------------'''
 
 # Parameters
 t0 = 0
 tf = 10
-Ns = np.geomspace(100000, tf*5, 300, dtype=int)
+Ns = np.geomspace(10000, tf*2, 100, dtype=int)
 dts = np.array([(tf-t0)/N for N in Ns])
 
 # Test eq
@@ -33,8 +37,9 @@ for i, N in enumerate(Ns):
 
 l = np.array(l)
 
-regressor = LinearRegression().fit(np.log(dts[:, None]**2), np.log(l))
-l_theoretical = regressor.predict(np.log(dts[:, None]**2))
+
+regressor = LinearRegression().fit(np.log(dts[:, None]**(p+1)), np.log(l+1e-12))
+l_theoretical = regressor.predict(np.log(dts[:, None]**(p+1)))
 
 plt.rcParams.update({
     'axes.labelsize': 'x-large',
@@ -42,8 +47,8 @@ plt.rcParams.update({
 })
 
 plt.figure()
-plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color='brown')
-plt.plot(dts, np.exp(l_theoretical), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{2})$', linewidth=2, color='grey')
+plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color='pink')
+plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/l[0]), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{4})$', linewidth=2, color='grey')
 plt.legend()
 plt.xlabel('h')
 plt.ylabel(r'$l_{k}$')

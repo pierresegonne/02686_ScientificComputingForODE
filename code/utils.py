@@ -2,16 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 colors = [
-    'black',
+    'black', # true
     'grey',
-    'brown',
-    'peru',
-    'darkorange',
-    'olivedrab',
-    'lightseagreen',
+    'brown', # ie
+    'peru', # esdirk23
+    'darkorange', # dopri54
+    'olivedrab', # ee
+    'lightseagreen', # default
     'steelblue',
-    'darkorchid',
-    'pink'
+    'darkorchid', # rk4
+    'pink' # ownrk
 ]
 
 solver_options = {
@@ -19,10 +19,10 @@ solver_options = {
         'color': 'lightseagreen'
     },
     'dopri54': {
-        'color': 'black'
+        'color': 'darkorange'
     },
     'esdirk23': {
-        'color': 'black'
+        'color': 'peru'
     },
     'explicit_euler': {
         'color': 'olivedrab'
@@ -31,10 +31,10 @@ solver_options = {
         'color': 'brown'
     },
     'own_rk': {
-        'color': 'black'
+        'color': 'pink'
     },
     'rk4': {
-        'color': 'black'
+        'color': 'darkorchid'
     }
 }
 

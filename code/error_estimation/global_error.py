@@ -4,17 +4,21 @@ import os
 
 from sys import path
 
-path.append(os.path.realpath('.'))
+path.append(os.path.realpath('..'))
 
 from sklearn.linear_model import LinearRegression
 
 from problems.test_equation import f, J
-from solvers.explicit_euler import ode_solver
+from solvers.own_rk import ode_solver
+
+'''------------- Expected order -------------'''
+p = 3
+'''------------------------------------------'''
 
 # Parameters
 t0 = 0
 tf = 10
-Ns = np.geomspace(1000000, tf*5, 300, dtype=int)
+Ns = np.geomspace(10000, tf*2, 100, dtype=int)
 dts = np.array([(tf-t0)/N for N in Ns])
 
 # Test eq
@@ -32,8 +36,8 @@ for i, N in enumerate(Ns):
 
 e = np.array(e)
 
-regressor = LinearRegression().fit(np.log(dts[:, None]), np.log(e))
-e_theoretical = regressor.predict(np.log(dts[:, None]))
+regressor = LinearRegression().fit(p*np.log(dts[:, None]), np.log(e))
+e_theoretical = regressor.predict(p*np.log(dts[:, None]))
 
 plt.rcParams.update({
     'axes.labelsize': 'x-large',
@@ -41,8 +45,8 @@ plt.rcParams.update({
 })
 
 plt.figure()
-plt.plot(dts, e, label=r'True $e_{t_{f}}$', linewidth=2, color='olivedrab')
-plt.plot(dts, np.exp(e_theoretical), label=r'Theoretical $e_{t_{f}}$, $\mathcal{O}(h)$', linewidth=2, color='grey')
+plt.plot(dts, e, label=r'True $e_{t_{f}}$', linewidth=3, color='pink')
+plt.plot(dts, (dts**p)/(dts[0]**p/e[0]), label=r'Theoretical $e_{t_{f}}$, $\mathcal{O}(h^{3})$', linewidth=2, color='grey')
 plt.legend()
 plt.xlabel('h')
 plt.ylabel(r'$e_{t_{f}}$')

@@ -44,9 +44,19 @@ B_hat = np.array(
     [(6 * gamma - 1) / (12 * gamma), 1 / (12 * gamma * (1 - 2 * gamma)), (1 - 3 * gamma) / (3 * (1 - 2 * gamma))])
 E = B - B_hat
 
+# Own RK
+# Butcher Tableau
+C = np.array([0, 1 / 3, 2 / 3])
+A = np.array([
+    [0, 0, 0],
+    [1 / 3, 0, 0],
+    [0, 2 / 3, 0],
+])
+B = np.array([1 / 4, 0, 3 / 4])
+
 # Meshgrid
 n = 1000
-plot_span = 20
+plot_span = 5
 real = np.linspace(-plot_span, plot_span, n)
 imag = np.linspace(-plot_span, plot_span, n)
 

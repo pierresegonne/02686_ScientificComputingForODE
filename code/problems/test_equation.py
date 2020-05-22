@@ -28,4 +28,7 @@ def plot_states(T, X, solvers, solver_options, with_true_solution=True, **kwargs
     for i, solver in enumerate(solvers):
         plt.plot(T[i], X[i], label=f"{solver}", color=solver_options[solver]['color'])
 
+    plt.xlabel('t')
+    plt.ylabel('x(t)')
+
     plt.legend()
