@@ -24,35 +24,35 @@ A = np.array([
     [9017 / 3168, -355 / 33, 46732 / 5247, 49 / 176, -5103 / 18656, 0, 0],
     [35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84, 0],
 ])
-B = np.array([5179 / 57600, 0, 7571 / 16695, 393 / 640, -92097 / 339200, 187 / 2100,
+B_hat = np.array([5179 / 57600, 0, 7571 / 16695, 393 / 640, -92097 / 339200, 187 / 2100,
               1 / 40])
-B_hat = np.array([35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84, 0])
+B = np.array([35 / 384, 0, 500 / 1113, 125 / 192, -2187 / 6784, 11 / 84, 0])
 E = np.array([-71 / 57600, 0, 71 / 16695, -71 / 1920, 17253 / 339200, -22 / 525,
               1 / 40])
 
-# ESDIRK23
-# Butcher Tableau
-gamma = (2 - np.sqrt(2)) / 2
-C = np.array([0, 2 * gamma, 1])
-A = np.array([
-    [0, 0, 0],
-    [gamma, gamma, 0],
-    [(1 - gamma) / 2, (1 - gamma) / 2, gamma]
-])
-B = np.array([(1 - gamma) / 2, (1 - gamma) / 2, gamma])
-B_hat = np.array(
-    [(6 * gamma - 1) / (12 * gamma), 1 / (12 * gamma * (1 - 2 * gamma)), (1 - 3 * gamma) / (3 * (1 - 2 * gamma))])
-E = B - B_hat
-
-# Own RK
-# Butcher Tableau
-C = np.array([0, 1 / 3, 2 / 3])
-A = np.array([
-    [0, 0, 0],
-    [1 / 3, 0, 0],
-    [0, 2 / 3, 0],
-])
-B = np.array([1 / 4, 0, 3 / 4])
+# # ESDIRK23
+# # Butcher Tableau
+# gamma = (2 - np.sqrt(2)) / 2
+# C = np.array([0, 2 * gamma, 1])
+# A = np.array([
+#     [0, 0, 0],
+#     [gamma, gamma, 0],
+#     [(1 - gamma) / 2, (1 - gamma) / 2, gamma]
+# ])
+# B = np.array([(1 - gamma) / 2, (1 - gamma) / 2, gamma])
+# B_hat = np.array(
+#     [(6 * gamma - 1) / (12 * gamma), 1 / (12 * gamma * (1 - 2 * gamma)), (1 - 3 * gamma) / (3 * (1 - 2 * gamma))])
+# E = B - B_hat
+#
+# # Own RK
+# # Butcher Tableau
+# C = np.array([0, 1 / 3, 2 / 3])
+# A = np.array([
+#     [0, 0, 0],
+#     [1 / 3, 0, 0],
+#     [0, 2 / 3, 0],
+# ])
+# B = np.array([1 / 4, 0, 3 / 4])
 
 # Meshgrid
 n = 1000

@@ -69,14 +69,16 @@ def get_ode_solver(solver):
 
 
 '''------------------ RUN ------------------'''
-solvers = ['own_rk', 'default']
+solvers = ['rk4']
 problem = 'test_equation'
 
-adaptive_step_size = False
+adaptive_step_size = True
 
 t0 = 0
-tf = 3
-N = 6
+tf = 100
+# bh vdp 4000 cstr 200
+# sh vdp cstr 100000
+N = 50
 
 
 # Simple check for time scale of CSTR

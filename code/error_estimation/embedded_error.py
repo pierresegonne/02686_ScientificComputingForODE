@@ -9,16 +9,19 @@ path.append(os.path.realpath('..'))
 from sklearn.linear_model import LinearRegression
 
 from problems.test_equation import f, J
+
+# To modify when changing solvers
 from solvers.dopri54 import ode_solver
 solver_colour = 'darkorange'
 '''------------- Expected order -------------'''
 p = 5
 '''------------------------------------------'''
+# -------
 
 # Parameters
 t0 = 0
 tf = 10
-Ns = np.geomspace(2000, tf*2, 100, dtype=int)
+Ns = np.geomspace(10000, tf*2, 10, dtype=int)
 dts = np.array([(tf-t0)/N for N in Ns])
 
 # Test eq
@@ -26,32 +29,33 @@ lbd = -1
 x0 = np.array([1])
 
 l = []
+e = []
 k = 10
 
 for i, N in enumerate(Ns):
-    X, T, _ = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
+    X, T, controllers = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
 
     x_local = X[k-1]*np.exp(lbd*dts[i])
     lk = np.abs(X[k] - x_local)
     l.append(lk)
+    e.append(controllers['e'][k])
 
 l = np.array(l)
-
-
-regressor = LinearRegression().fit(np.log(dts[:, None]**(p+1)), np.log(l+1e-12))
-l_theoretical = regressor.predict(np.log(dts[:, None]**(p+1)))
+e = np.abs(np.array(e))
 
 plt.rcParams.update({
     'axes.labelsize': 'x-large',
-    'font.size': 20,
+    'font.size': 13,
 })
 
 plt.figure()
-plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color=solver_colour)
-plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/l[0]), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{6})$', linewidth=2, color='grey')
+plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/l[0]), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{6})$', linestyle='dashed', linewidth=1.5, color='blue')
+plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color='black')
+plt.plot(dts, (dts**(p))/(dts[0]**(p)/e[0]), label=r'Asymptotic Order for Embedded Error $e_{k}$, $\mathcal{O}(h^{4})$', linestyle='dashed', linewidth=1.5, color='grey')
+plt.plot(dts, e, label=r'Estimated Error $e_{k}$', linewidth=3, color=solver_colour)
 plt.legend()
 plt.xlabel('h')
-plt.ylabel(r'$l_{k}$')
+plt.ylabel('error')
 plt.yscale('log')
 plt.xscale('log')
 

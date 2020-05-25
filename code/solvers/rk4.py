@@ -12,6 +12,7 @@ A = np.array([
 ])
 B = np.array([1 / 6, 1 / 3, 1 / 3, 1 / 6])
 
+P_RK4 = 4
 
 def rk4_step(f, t, x, dt, **kwargs):
     butcher_tableau = {
@@ -43,6 +44,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
         kwargs, abstol, reltol, epstol, facmax, facmin = parse_adaptive_step_params(kwargs)
 
+        p = P_RK4
         t = t0
         x = x0
 
@@ -71,10 +73,10 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
                     T.append(t)
                     X.append(x)
-                    controllers['dt'].append(dt)
-                    controllers['r'].append(r)
+                controllers['dt'].append(dt)
+                controllers['r'].append(r)
 
-                dt = np.maximum(facmin, np.minimum(np.sqrt(epstol / r), facmax)) * dt
+                dt = np.maximum(facmin, np.minimum((epstol / r)**(1 / (p + 1)), facmax)) * dt
 
     T = np.array(T)
     X = np.array(X)

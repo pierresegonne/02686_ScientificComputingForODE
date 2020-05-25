@@ -56,22 +56,24 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     X = [x0]
     controllers = {
         'r': [0.01],
+        'e': [np.zeros(x0.shape)],
         'dt': [dt],
     }
 
     if not adaptive_step_size:
 
         for k in range(N):
-            x, _ = dopri54_step(f, T[-1], X[-1], dt, **kwargs)
+            x, e = dopri54_step(f, T[-1], X[-1], dt, **kwargs)
             X.append(x)
             T.append(T[-1] + dt)
+            controllers['e'].append(e)
 
     if adaptive_step_size:
 
         kwargs, abstol, reltol, epstol, facmax, facmin = parse_adaptive_step_params(kwargs)
         p = P_DOPRI54
         k_p = 0.4/(p+1)
-        k_i =0.3/(p+1)
+        k_i = 0.3/(p+1)
 
         t = t0
         x = x0
@@ -93,15 +95,17 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
                     T.append(t)
                     X.append(x)
+                    controllers['e'].append(e)
+                    controllers['r'].append(r)
                 else:
                     dt = dt * (epstol / r)**(1/(p+1))
                 controllers['dt'].append(dt)
-                controllers['r'].append(r)
 
 
     T = np.array(T)
     X = np.array(X)
     controllers['dt'] = np.array(controllers['dt'])
     controllers['r'] = np.array(controllers['r'])
+    controllers['e'] = np.array(controllers['e'])
 
     return X, T, controllers

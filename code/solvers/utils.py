@@ -4,7 +4,7 @@ import numpy as np
 DEFAULT_ABS_TOL = 1e-6
 DEFAULT_REL_TOL = 1e-6
 DEFAULT_EPS_TOL = 0.8
-DEFAULT_FACTOR_MAX = 5
+DEFAULT_FACTOR_MAX = 10
 DEFAULT_FACTOR_MIN = 0.1
 
 # Newton's method parameters
