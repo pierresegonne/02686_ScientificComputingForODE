@@ -33,17 +33,17 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
     T = [t0]
     X = [x0]
     controllers = {
-        'e': [0],
+        'e': [np.zeros(x0.shape)],
         'dt': [dt]
     }
 
-    if not adaptive_step_size:
+    # if not adaptive_step_size:
 
-        for k in range(N):
-            x, e = own_rk_step(f, T[-1], X[-1], dt, **kwargs)
-            X.append(x)
-            T.append(T[-1] + dt)
-            controllers['e'].append(e)
+    for k in range(N):
+        x, e = own_rk_step(f, T[-1], X[-1], dt, **kwargs)
+        X.append(x)
+        T.append(T[-1] + dt)
+        controllers['e'].append(e)
 
     T = np.array(T)
     X = np.array(X)

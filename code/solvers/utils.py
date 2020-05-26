@@ -10,6 +10,11 @@ DEFAULT_FACTOR_MIN = 0.1
 # Newton's method parameters
 DEFAULT_NEWTONS_TOL = 1e-8
 DEFAULT_NEWTONS_MAX_ITERS = 100
+DEFAULT_MAX_DIVERGE_STEPS = 100
+
+# ESDIRK23
+DEFAULT_HMAX = 10
+DEFAULT_HMIN = 0.1
 
 # Default solver
 # Note originally in scipy the default for Atol is 1e-12
@@ -32,6 +37,11 @@ def parse_newtons_params(params):
 
     return params, newtons_tol, newtons_max_iters
 
+def parse_inexact_newtons_params(params, epsilon):
+    tau = epsilon * 0.1
+    params, max_diverged_steps = parse_one_param(params, 'max_diverged_steps', DEFAULT_MAX_DIVERGE_STEPS)
+
+    return params, max_diverged_steps, tau
 
 def parse_adaptive_step_params(params):
     params, abstol = parse_one_param(params, 'abstol', DEFAULT_ABS_TOL)
@@ -41,6 +51,12 @@ def parse_adaptive_step_params(params):
     params, facmin = parse_one_param(params, 'facmin', DEFAULT_FACTOR_MIN)
 
     return params, abstol, reltol, epstol, facmax, facmin
+
+def parse_adaptive_step_params_esdirk(params):
+    params, hmax = parse_one_param(params, 'hmax', DEFAULT_HMAX)
+    params, hmin = parse_one_param(params, 'hmin', DEFAULT_HMIN)
+
+    return params, hmax, hmin
 
 def parse_default_ode_params(params):
     params, atol = parse_one_param(params, 'atol', DEFAULT_ABS_TOL)

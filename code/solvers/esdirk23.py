@@ -1,7 +1,8 @@
 import numpy as np
 import scipy as sp
 
-from solvers.utils import parse_adaptive_step_params, parse_newtons_params
+from solvers.utils import parse_adaptive_step_params, parse_adaptive_step_params_esdirk, parse_inexact_newtons_params, \
+    parse_newtons_params
 
 # ESDIRK23
 # Butcher Tableau
@@ -21,7 +22,6 @@ P_ESDIRK23 = 3
 
 
 def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
-    global E
 
     dt = (tf - t0) / N
     t = t0
@@ -34,27 +34,18 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
         'r': [0],
     }
 
-    # parameters needed,
-    # tau: convergence newton
-    # max iterations: newton
-    # max_diverged_steps: newton
-    #
-    # epsilon = 0.8: PI controller
-    epsilon = 0.8
+    # Parameters needed
     kwargs, newtons_tol, newtons_max_iters = parse_newtons_params(kwargs)
-    newtons_tau = epsilon * 0.1
     kwargs, abstol, reltol, epstol, facmax, facmin = parse_adaptive_step_params(kwargs)
-    hmax = 10
-    hmin = 0.1
-    newtons_max_iters = 20  # From matlab
-    max_diverged_steps = 20  # From matlab
+    kwargs, max_diverged_steps, newtons_tau = parse_inexact_newtons_params(kwargs, epstol)
+    kwargs, hmax, hmin = parse_adaptive_step_params_esdirk(kwargs)
 
     p = P_ESDIRK23
-    nx = x0.shape[0]
-    I = np.eye(nx)
+    D = x0.shape[0]
+    I = np.eye(D)
     T_stages = np.zeros((p,))
-    X_stages = np.zeros((p, nx))
-    F_stages = np.zeros((p, nx))
+    X_stages = np.zeros((p, D))
+    F_stages = np.zeros((p, D))
 
     F_stages[-1, :] = f(t, x, **kwargs)
 
@@ -68,7 +59,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
         J_eval = J(t, x, **kwargs)
         M = I - dt * gamma * J_eval
-        L, U = sp.linalg.lu(M, permute_l=True)  # Ok checked we get the same as in matlab
+        L, U = sp.linalg.lu(M, permute_l=True)
 
         # Stage 0
         T_stages[0] = t
@@ -87,6 +78,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
             R = X_stages[i, :] - dt * gamma * F_stages[i, :] - sum_i
 
+            # Control convergence of inexact Newton's method
             r_newton = np.amax(np.abs(R) / np.maximum(abstol, np.abs(X_stages[i, :]) * reltol))
 
             n_iter_in_newton = 0
@@ -118,7 +110,7 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
         # Error estimation
         e = dt * E @ F_stages
         r_step_control = np.amax(
-            np.abs(e) / np.maximum(abstol, np.abs(X_stages[-1, :]) * reltol))  # Note: last X in stages is actually xn+1
+            np.abs(e) / np.maximum(abstol, np.abs(X_stages[-1, :]) * reltol))
 
         if adaptive_step_size:
             if step_diverged:
@@ -129,16 +121,17 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
 
                 if accept_step:
                     if n_steps == 1:
-                        dt_modified = (epsilon / r_step_control) ** (1 / p) * dt
+                        dt_modified = (epstol / r_step_control) ** (
+                                    1 / (p + 1)) * dt  # First step -> asymptotic controller
                     else:
                         dt_modified = (dt / controllers['dt'][-1]) \
-                                      * ((epsilon / r_step_control) ** (1 / p)) \
-                                      * ((controllers['r'][-1] / r_step_control) ** (1 / p)) \
-                                      * dt
+                                      * ((epstol / r_step_control) ** (1 / (p + 1))) \
+                                      * ((controllers['r'][-1] / r_step_control) ** (1 / (p + 1))) \
+                                      * dt  # PI controller
 
                     dt = np.minimum(np.maximum(dt_modified, dt * hmin), dt * hmax)
                 else:
-                    dt = (epsilon / r_step_control) ** (1 / p) * dt
+                    dt = (epstol / r_step_control) ** (1 / (p + 1)) * dt  # Rejected step -> asymptotic controller
 
         if not adaptive_step_size:
             # Fixed step size controller

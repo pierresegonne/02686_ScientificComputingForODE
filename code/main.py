@@ -69,16 +69,16 @@ def get_ode_solver(solver):
 
 
 '''------------------ RUN ------------------'''
-solvers = ['explicit_euler']
-problem = 'test_equation'
+solvers = ['default', 'implicit_euler']
+problem = 'cstr_1d'
 
-adaptive_step_size = True
+adaptive_step_size = False
 
 t0 = 0
-tf = 3
+tf = 35
 # bh vdp 4000 cstr 200
 # sh vdp cstr 100000
-N = 1
+N = 100000
 
 
 # Simple check for time scale of CSTR
@@ -100,12 +100,8 @@ for solver in solvers:
     all_T.append(T)
     all_controllers.append(controllers)
 
-    from solvers.utils import DEFAULT_EPS_TOL
-    print(DEFAULT_EPS_TOL, len(X), len(controllers['dt']), X[-1], x0 * np.exp(params['lbd'] * tf), np.abs(X[-1] - x0 * np.exp(params['lbd'] * tf)))
-
 plotter(all_T, all_X, solvers, solver_options)
 if adaptive_step_size:
     controller_plot(all_T, all_controllers, solvers)
-    print(controllers['dt'][-1])
 
 plt.show()

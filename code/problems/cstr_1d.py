@@ -47,9 +47,9 @@ def J(t, X, **kwargs):
         return EaR / (T ** 2) * k(T)
 
     T = X
-    return np.array([[
+    return np.array([
         -(F(t) / V) + Beta * (k_prime(T) * Ca(T) * Cb(T) + k(T) * Ca_prime(T) * Cb(T) + k(T) * Ca(T) * Cb_prime(T))
-    ]])
+    ])
 
 
 '''--------------------- Plotting ---------------------'''
