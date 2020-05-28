@@ -13,24 +13,11 @@ A = np.array([
     [9017/3168, -355/33, 46732/5247, 49/176, -5103/18656, 0, 0],
     [35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0],
 ])
-B = np.array([5179/57600, 0, 7571/16695, 393/640, -92097/339200, 187/2100,
+B_hat = np.array([5179/57600, 0, 7571/16695, 393/640, -92097/339200, 187/2100,
               1/40])
-B_hat = np.array([35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0])
-E = np.array([-71/57600, 0, 71/16695, -71/1920, 17253/339200, -22/525,
-              1/40])
+B = np.array([35/384, 0, 500/1113, 125/192, -2187/6784, 11/84, 0])
+E = B - B_hat
 
-"""
-Might be typo on the figures verify with wikipedia:
-	0
-1/5	1/5
-3/10	3/40	9/40
-4/5	44/45	−56/15	32/9
-8/9	19372/6561	−25360/2187	64448/6561	−212/729
-1	9017/3168	−355/33	46732/5247	49/176	−5103/18656
-1	35/384	0	500/1113	125/192	−2187/6784	11/84	
-35/384	0	500/1113	125/192	−2187/6784	11/84	0
-5179/57600	0	7571/16695	393/640	−92097/339200	187/2100	1/40
-"""
 
 # Order
 P_DOPRI54 = 5
@@ -91,14 +78,14 @@ def ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, **kwargs):
                 if accept_step:
                     t = t + dt
                     x = x_hat
-                    dt = dt * (epstol/r)**(k_i) * (controllers['r'][-1]/r)**(k_p)
+                    dt = dt * np.maximum(facmin, np.minimum((epstol/r)**(k_i) * (controllers['r'][-1]/r)**(k_p), facmax))
 
                     T.append(t)
                     X.append(x)
                     controllers['e'].append(e)
                     controllers['r'].append(r)
                 else:
-                    dt = dt * (epstol / r)**(1/(p+1))
+                    dt = np.maximum(facmin, np.minimum((epstol / r)**(1 / (p + 1)), facmax)) * dt
                 controllers['dt'].append(dt)
 
 

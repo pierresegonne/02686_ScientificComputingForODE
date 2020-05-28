@@ -47,8 +47,6 @@ plt.rcParams.update({
 plt.figure()
 plt.plot(dts, e, label=r'True $e_{t_{f}}$', linewidth=3, color=solver_colour)
 plt.plot(dts, (dts**p)/(dts[0]**p/e[0]), label=r'Theoretical $e_{t_{f}}$, $\mathcal{O}(h^{5})$', linewidth=2, color='grey')
-plt.plot(dts, (dts**(p-1))/(dts[0]**(p-1)/e[0]), label=r'Theoretical $e_{t_{f}}$, $\mathcal{O}(h^{4})$', linewidth=2, color='blue')
-plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/e[0]), label=r'Theoretical $e_{t_{f}}$, $\mathcal{O}(h^{6})$', linewidth=2, color='red')
 plt.legend()
 plt.xlabel('h')
 plt.ylabel(r'$e_{t_{f}}$')

@@ -69,16 +69,16 @@ def get_ode_solver(solver):
 
 
 '''------------------ RUN ------------------'''
-solvers = ['default', 'implicit_euler']
-problem = 'cstr_1d'
+solvers = ['default', 'dopri54']
+problem = 'cstr_3d'
 
-adaptive_step_size = False
+adaptive_step_size = True
 
 t0 = 0
 tf = 35
 # bh vdp 4000 cstr 200
 # sh vdp cstr 100000
-N = 100000
+N = 200
 
 
 # Simple check for time scale of CSTR

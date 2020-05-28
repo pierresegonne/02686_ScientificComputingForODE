@@ -8,6 +8,10 @@ from implicit_explicit import sde_solver as ie_sde_solver
 
 from vanderpol import x_dimension as vanderpol_x_dimension, f as vanderpol_f, J as vanderpol_J, \
     diffusion_1 as vanderpol_g_1, diffusion_2 as vanderpol_g_2, plot_states as vanderpol_plot_states
+from cstr_1d import x_dimension as cstr1d_x_dimension, f as cstr1d_f, J as cstr1d_J, \
+    diffusion as cstr1d_g, plot_states as cstr1d_plot_states
+from cstr_3d import x_dimension as cstr3d_x_dimension, f as cstr3d_f, J as cstr3d_J, \
+    diffusion as cstr3d_g, plot_states as cstr3d_plot_states
 
 from utils import DEFAULT_ABS_TOL, DEFAULT_REL_TOL, DEFAULT_NEWTONS_TOL, DEFAULT_NEWTONS_MAX_ITERS
 from utils import wiener_process
@@ -17,15 +21,19 @@ def get_problem(problem):
     if problem == 'vanderpol_1':
         x_dimension, f, J, g, plotter = vanderpol_x_dimension, vanderpol_f, vanderpol_J, vanderpol_g_1, vanderpol_plot_states
         x0 = np.array([0.5, 0.5])
-        params = {'mu': 12, 'sigma': 0.5}
+        params = {'mu': 3, 'sigma': 0.03}
     elif problem == 'vanderpol_2':
         x_dimension, f, J, g, plotter = vanderpol_x_dimension, vanderpol_f, vanderpol_J, vanderpol_g_2, vanderpol_plot_states
         x0 = np.array([0.5, 0.5])
-        params = {'mu': 2, 'sigma': 0.5}
+        params = {'mu': 3, 'sigma': 0.5}
     elif problem == 'cstr_1d':
-        pass
-    elif problem == 'ctsr_3d':
-        pass
+        x_dimension, f, J, g, plotter = cstr1d_x_dimension, cstr1d_f, cstr1d_J, cstr1d_g, cstr1d_plot_states
+        x0 = np.array([273.65])
+        params = {'sigma': 1}
+    elif problem == 'cstr_3d':
+        x_dimension, f, J, g, plotter = cstr3d_x_dimension, cstr3d_f, cstr3d_J, cstr3d_g, cstr3d_plot_states
+        x0 = np.array([0., 0., 273.65])
+        params = {'sigma': 1}
     return x_dimension, f, J, g, plotter, x0, params
 
 
@@ -52,7 +60,7 @@ def ode_solver(f, J, t0, tf, N, x0, **kwargs):
     del kwargs['sigma']
     r.set_initial_value(x0, t0).set_f_params(*kwargs.values()).set_jac_params(*kwargs.values())
 
-    if N < 5000:
+    if N < 25000:
         N = N * 100
     dt = (tf - t0) / N
 
@@ -70,12 +78,12 @@ def ode_solver(f, J, t0, tf, N, x0, **kwargs):
 
 
 '''------------------ RUN ------------------'''
-solver = 'explicit_explicit'
-problem = 'vanderpol_1'
+solver = 'implicit_explicit'
+problem = 'cstr_3d'
 
 t0 = 0
-tf = 15
-N = 1000
+tf = 35
+N = 3000
 
 N_REALISATIONS = 5
 
@@ -96,7 +104,7 @@ for n in range(N_REALISATIONS):
     all_T.append(T)
 
 # ODE reference
-ode_X, ode_T = ode_solver(f, J, t0, tf, N, x0, **params)
+ode_X, ode_T = ode_solver(f, J, t0, tf, 5000000, x0, **params)
 
 plotter(all_T, all_X, ode_T, ode_X)
 plt.show()

@@ -9,15 +9,15 @@ path.append(os.path.realpath('..'))
 from problems.test_equation import f, J
 
 # To modify when changing solvers
-from solvers.own_rk import ode_solver
-solver_colour = 'pink'
+from solvers.dopri54 import ode_solver
+solver_colour = 'darkorange'
 # -------
 
 
 # Parameters
 t0 = 0
 tf = 10
-N = 40
+N = 5
 dt = (tf - t0) / N
 
 ticks_for_true = np.linspace(t0, tf, 1000)

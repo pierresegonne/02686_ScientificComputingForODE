@@ -32,7 +32,7 @@ for i, N in enumerate(Ns):
     X, T, _ = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
 
     x_local = X[k-1]*np.exp(lbd*dts[i])
-    lk = np.abs(X[k] - x_local)
+    lk = np.abs(X[k] - x_local) + 1e-18
     l.append(lk)
 
 l = np.array(l)

@@ -21,7 +21,7 @@ p = 5
 # Parameters
 t0 = 0
 tf = 10
-Ns = np.geomspace(10000, tf*2, 10, dtype=int)
+Ns = np.geomspace(9000, tf*2, 10, dtype=int)
 dts = np.array([(tf-t0)/N for N in Ns])
 
 # Test eq
@@ -36,7 +36,7 @@ for i, N in enumerate(Ns):
     X, T, controllers = ode_solver(f, J, t0, tf, N, x0, adaptive_step_size=False, lbd=lbd)
 
     x_local = X[k-1]*np.exp(lbd*dts[i])
-    lk = np.abs(X[k] - x_local)
+    lk = np.abs(X[k] - x_local) + 1e-22
     l.append(lk)
     e.append(controllers['e'][k])
 
@@ -49,7 +49,7 @@ plt.rcParams.update({
 })
 
 plt.figure()
-plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/l[0]), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{6})$', linestyle='dashed', linewidth=1.5, color='blue')
+plt.plot(dts, (dts**(p+1))/(dts[0]**(p+1)/l[0]), label=r'Theoretical $l_{k}$, $\mathcal{O}(h^{6})$', linestyle='dashed', linewidth=1.5, color='grey')
 plt.plot(dts, l, label=r'True $l_{k}$', linewidth=2, color='black')
 plt.plot(dts, (dts**(p))/(dts[0]**(p)/e[0]), label=r'Asymptotic Order for Embedded Error $e_{k}$, $\mathcal{O}(h^{4})$', linestyle='dashed', linewidth=1.5, color='grey')
 plt.plot(dts, e, label=r'Estimated Error $e_{k}$', linewidth=3, color=solver_colour)
